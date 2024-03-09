@@ -3,12 +3,15 @@ package utility;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.service.local.AppiumServiceBuilder;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +39,8 @@ public class CommonUtils {
 	private static DesiredCapabilities capabilities = new DesiredCapabilities();
 	private static URL serverUrl;
 	private static AppiumDriver driver;
+	public static AppiumServiceBuilder serviceBuilder = new AppiumServiceBuilder();
+
 
 	public static void loadConfigProp(String propertyFileName) throws IOException {
 		FileInputStream fis = new FileInputStream(
@@ -70,6 +75,9 @@ public class CommonUtils {
 	}
 
 	public static AppiumDriver getDriver() throws MalformedURLException {
+		serviceBuilder.withAppiumJS(new File("/usr/local/lib/node_modules/appium/build/lib/main.js"))
+				.withIPAddress("127.0.0.1").usingPort(4723).withTimeout(Duration.ofSeconds(200))
+				.build().start();
 		serverUrl = new URL("http://localhost:" + APPIUM_PORT + "/wd/hub");
 		driver = new AndroidDriver(serverUrl, capabilities);
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
